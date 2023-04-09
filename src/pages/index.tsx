@@ -1,124 +1,62 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { gql, GraphQLClient } from "graphql-request";
 
-const inter = Inter({ subsets: ['latin'] })
+export const getStaticProps = async () => {
+  interface IVideos {
+    createdAt: Date;
+    description: string;
+    id: string;
+    publishedAt: Date;
+    seen: boolean;
+    slug: string;
+    tags: [string];
+    title: string;
+    thumbnail: [string];
+    mp4: [string];
+  }
+  interface IVideoData {
+    videos: IVideos;
+  }
+  const url =
+    "https://api-ap-south-1.hygraph.com/v2/clg9abtj5283t01um9b41h8ec/master";
+  const graphQLClient = new GraphQLClient(url, {
+    headers: {
+      Authorization:
+        "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE2ODEwNTkyOTQsImF1ZCI6WyJodHRwczovL2FwaS1hcC1zb3V0aC0xLmh5Z3JhcGguY29tL3YyL2NsZzlhYnRqNTI4M3QwMXVtOWI0MWg4ZWMvbWFzdGVyIiwibWFuYWdlbWVudC1uZXh0LmdyYXBoY21zLmNvbSJdLCJpc3MiOiJodHRwczovL21hbmFnZW1lbnQuZ3JhcGhjbXMuY29tLyIsInN1YiI6IjAxODA1MDlkLWY4OWQtNGM5My1iMDk0LWJjZTMzYjBhNTBlOSIsImp0aSI6ImNsZzluYXN0bjJhd3kwMXVrMnlvczYxdG4ifQ.CbLjS7zuD1Wd13AJbYJucMwsqF7TTPGWW89bc5iGDKhvH96YDXH1yiFJ474QQO-xnvqUuvewZWlTzMJPWxhX5BoSvKE06iOxYt0tWkzMdw_RCvptvzNT6zNf3EHMQVp-571LPgSz516Kpd5TFXCWQ9-6wptopi2SiJPsJFnVdlltD-UxYT1fH3Ej9UOIzrpcFhNdYqstVa8Cu8hqatvzebhbiTUmO2ihnqBxF7GIAHYIGM8AkkJZmd_S7p_slY5VoHLDqGprbqswidO2OkYHuv84dtMWxF_4shmVxNEha9nbEZrbYvRBHXS69dsPrWTKlWD8GETVd8qXmAv1tjPd_J8tjoyuYui6_JGYZ2s0zo8LocWGpFHkCbZ2nv__uDORz1jktK4uKaolxQ4Vmhy_-pZGjXMBHITEgtbYgr-N2FoX7Ylr8_24dQV-DmesOikbS7x6uu_Sg_V8eOmKv--voh8IUgPHn7eWrl82wE0GS8qM5TwtdALMvOijRdZX7RmkRhXNRsSkiO39J3tM837heE0pCTS4vAmbn8YfhJo4k3xg-U9CbbaLRRtPFN_ETys55jeOY0O3u3Os99FpcWrIDwZmh2GntylJRPyLnllU9sgLv_wziP4CZHIZ82gpYHKJ1civeXr-rtc-A8ynBOcGEzV3EHTmDFfIhGSKg9q6r2U",
+    },
+  });
+  const query = gql`
+    query Videos {
+      videos {
+        createdAt
+        description
+        id
+        publishedAt
+        seen
+        slug
+        tags
+        title
+        thumbnail {
+          url
+        }
+        mp4 {
+          url
+        }
+      }
+    }
+  `;
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+  const data: IVideoData = await graphQLClient.request(query);
+  const videos = data.videos;
+  return {
+    props: {
+      videos,
+    },
+  };
+};
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+const Home = ({ videos }) => {
+  console.log(videos);
+  return <div className="bg-green-100">Hello</div>;
+};
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`${inter.className} mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p
-            className={`${inter.className} m-0 max-w-[30ch] text-sm opacity-50`}
-          >
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default Home;
